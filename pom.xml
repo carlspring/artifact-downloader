@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.carlspring.maven</groupId>
+    <artifactId>artifact-downloader</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Artifact Downloader</name>
+
+    <licenses>
+        <license>
+            <name>Apache 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>Carlspring Consulting &amp; Development Ltd.</name>
+        <url>http://www.carlspring.org/</url>
+    </organization>
+
+    <inceptionYear>2016</inceptionYear>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <version.jetty>9.3.2.v20150730</version.jetty>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+
+                <configuration>
+                    <debug>true</debug>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <debug>true</debug>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.carlspring.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- For search app in general -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.5</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven.indexer</groupId>
+            <artifactId>indexer-core</artifactId>
+            <version>6.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.1</version>
+        </dependency>
+
+        <!-- For ResourceFetcher implementation, if used -->
+        <dependency>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-http-lightweight</artifactId>
+            <version>2.3</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Runtime: DI, but using Plexus Shim as we use Wagon -->
+        <dependency>
+            <groupId>org.eclipse.sisu</groupId>
+            <artifactId>org.eclipse.sisu.plexus</artifactId>
+            <version>0.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guice</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.5</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+            <version>2.22</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet-core</artifactId>
+            <version>2.22</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>2.22</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <!-- These two profiles need to be on top: -->
+        <profile>
+            <id>reserve-ports</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+
+                        <executions>
+                            <execution>
+                                <id>reserve-network-port</id>
+                                <goals>
+                                    <goal>reserve-network-port</goal>
+                                </goals>
+                                <phase>initialize</phase>
+                                <configuration>
+                                    <portNames>
+                                        <portName>port.jetty.listen</portName>
+                                        <portName>port.jetty.shutdown</portName>
+                                    </portNames>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>set-default-ports</id>
+            <activation>
+                <property>
+                    <name>skipTests</name>
+                    <value>!true</value>
+                </property>
+
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <properties>
+                <!-- Default ports for local development: -->
+                <port.jetty.listen>48080</port.jetty.listen>
+                <port.jetty.shutdown>19081</port.jetty.shutdown>
+            </properties>
+        </profile>
+        <!-- These two profiles need to be on top. -->
+
+        <profile>
+            <!-- Required for the sake of the integration tests: -->
+            <id>set-host-default</id>
+            <activation>
+                <property>
+                    <name>!host</name>
+                </property>
+            </activation>
+
+            <properties>
+                <host>localhost</host>
+            </properties>
+        </profile>
+        <profile>
+            <id>set-host</id>
+            <activation>
+                <property>
+                    <name>host</name>
+                </property>
+            </activation>
+
+            <properties>
+                <host>${host}</host>
+            </properties>
+        </profile>
+        <profile>
+            <!-- Required for the sake of the integration tests: -->
+            <id>set-port-default</id>
+            <activation>
+                <property>
+                    <name>!port</name>
+                </property>
+            </activation>
+
+            <properties>
+                <port>${port.jetty.listen}</port>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>run-it-tests</id>
+            <activation>
+                <property>
+                    <name>!skipTests</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-maven-plugin</artifactId>
+                        <version>${version.jetty}</version>
+
+                        <configuration>
+                            <scanIntervalSeconds>10</scanIntervalSeconds>
+
+                            <daemon>true</daemon>
+
+                            <webApp>
+                                <contextPath>/</contextPath>
+                                <descriptor>${basedir}/src/test/webapp/WEB-INF/web.xml</descriptor>
+                            </webApp>
+
+                            <stopPort>${port.jetty.shutdown}</stopPort>
+                            <stopKey>53AS9DS1FD8E3WEFEW9GR1ER8G2ER0WE31</stopKey>
+                            <stopWait>10</stopWait>
+
+                            <httpConnector>
+                                <port>${port.jetty.listen}</port>
+                            </httpConnector>
+
+                            <systemProperties>
+                                <force>true</force>
+                            </systemProperties>
+
+                            <useTestScope>true</useTestScope>
+                        </configuration>
+
+                        <executions>
+                            <execution>
+                                <id>jetty-stop</id>
+
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.eclipse.jetty</groupId>
+                                <artifactId>jetty-util</artifactId>
+                                <version>${version.jetty}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.eclipse.jetty</groupId>
+                                <artifactId>jetty-runner</artifactId>
+                                <version>${version.jetty}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.19.1</version>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <host>${host}</host>
+                                <port>${port}</port>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jetty-start</id>
+            <activation>
+                <property>
+                    <name>!jetty.block</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-maven-plugin</artifactId>
+
+                        <configuration>
+                            <daemon>true</daemon>
+                        </configuration>
+
+                        <executions>
+                            <execution>
+                                <id>jetty-start</id>
+
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jetty-block</id>
+            <activation>
+                <property>
+                    <name>jetty.block</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-maven-plugin</artifactId>
+
+                        <configuration>
+                            <daemon>false</daemon>
+                        </configuration>
+
+                        <executions>
+                            <execution>
+                                <id>jetty-run</id>
+
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
