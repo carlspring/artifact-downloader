@@ -64,6 +64,13 @@ public class ArtifactDownloader
 
                     totalBytesRead += numberOfBytesRead;
 
+                    long duration = System.currentTimeMillis() - startTime;
+
+                    result.setContentLength(contentLength);
+                    result.setDownloadLength(totalBytesRead);
+                    result.setDuration(duration);
+                    result.setResponseCode(response.getStatusLine().getStatusCode());
+
                     if (verbose && contentLength > 0)
                     {
                         if (totalBytesRead != contentLength)
@@ -81,13 +88,6 @@ public class ArtifactDownloader
                         }
                         else
                         {
-                            long duration = System.currentTimeMillis() - startTime;
-
-                            result.setContentLength(contentLength);
-                            result.setDownloadLength(totalBytesRead);
-                            result.setDuration(duration);
-                            result.setResponseCode(response.getStatusLine().getStatusCode());
-
                             System.out.println("\rDownloaded " + totalBytesRead + "/" + contentLength + " bytes in " +
                                                duration + " ms " +
                                                "from " + url.toString() + " " +
