@@ -40,9 +40,6 @@
     <logger name="org.carlspring">
         <level value="DEBUG"/>
     </logger>
-    <logger name="org.carlspring.logging">
-        <level value="DEBUG"/>
-    </logger>
     <logger name="org.glassfish.jersey">
         <level value="DEBUG"/>
     </logger>
