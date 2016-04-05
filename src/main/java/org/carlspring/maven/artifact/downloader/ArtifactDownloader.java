@@ -93,7 +93,9 @@ public class ArtifactDownloader
                             System.out.println("\rDownloaded " + totalBytesRead + "/" + contentLength + " bytes in " +
                                                duration + " ms " +
                                                "from " + url.toString() + " " +
-                                               "at an average speed of " + (contentLength / (duration / 1000)) + " bytes/s.");
+                                               "at an average speed of " +
+                                               (duration > 0 ? (contentLength / (duration / 1000)) : contentLength) +
+                                               " bytes/s.");
                         }
                     }
 
