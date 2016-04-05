@@ -64,7 +64,7 @@ public class ArtifactDownloader
 
                     totalBytesRead += numberOfBytesRead;
 
-                    if (verbose)
+                    if (verbose && contentLength > 0)
                     {
                         if (totalBytesRead != contentLength)
                         {
