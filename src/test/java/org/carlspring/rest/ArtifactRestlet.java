@@ -1,11 +1,5 @@
 package org.carlspring.rest;
 
-/*
-import org.carlspring.maven.commons.util.ArtifactUtils;
-import org.carlspring.strongbox.resource.ConfigurationResourceResolver;
-import org.carlspring.strongbox.resource.ResourceCloser;
-*/
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
