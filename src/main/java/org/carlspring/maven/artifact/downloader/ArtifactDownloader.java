@@ -81,7 +81,9 @@ public class ArtifactDownloader
                             }
                             else
                             {
-                                BigDecimal percent = new BigDecimal((100d * totalBytesRead) / contentLength);
+                                BigDecimal percent = totalBytesRead > 0 ?
+                                                     new BigDecimal((100d * totalBytesRead) / contentLength) :
+                                                     new BigDecimal(0);
 
                                 System.out.print("\rDownloaded " + percent.intValue() + "/100 %...");
                             }
