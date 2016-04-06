@@ -30,8 +30,9 @@ public class ArtifactDownloader
             throws IOException,
                    URISyntaxException
     {
-        FileOutputStream fos = new FileOutputStream(file);
-        download(url, fos);
+//        FileOutputStream fos = new FileOutputStream(file);
+//        download(url, fos);
+        process(url, file);
     }
 
     private void process(URL url, File file)
