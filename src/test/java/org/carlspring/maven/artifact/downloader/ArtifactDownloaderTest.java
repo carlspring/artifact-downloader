@@ -19,6 +19,7 @@ public class ArtifactDownloaderTest
 
     public static final String TARGET_DIR = "target/test-resources";
     public static final String TARGET_DIR2 = "target/repository";
+    public static final String DOWNLOAD_DIR = "target/test-download";
 
 
     @Before
@@ -82,13 +83,13 @@ public class ArtifactDownloaderTest
     }
 
     @Test
-    public void testArtifactDownloading2()
+    public void testRecursiveArtifactDownloading()
             throws IOException, URISyntaxException
     {
         ArtifactDownloader downloader = new ArtifactDownloader();
         downloader.setVerbose(true);
 
         downloader.download(new URL("http://localhost:48080/storages/storage0/test-releases/com/foo/"),
-                new File(TARGET_DIR + "/"));
+                new File(DOWNLOAD_DIR + "/"));
     }
 }

@@ -32,6 +32,9 @@ public class ArtifactDownloader
     {
 //        FileOutputStream fos = new FileOutputStream(file);
 //        download(url, fos);
+        if(!file.exists())
+            file.mkdir();
+
         process(url, file);
     }
 
