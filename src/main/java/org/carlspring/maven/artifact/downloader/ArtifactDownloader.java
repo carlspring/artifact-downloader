@@ -1,6 +1,5 @@
 package org.carlspring.maven.artifact.downloader;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -30,10 +29,10 @@ public class ArtifactDownloader
             throws IOException,
                    URISyntaxException
     {
-//        FileOutputStream fos = new FileOutputStream(file);
-//        download(url, fos);
-        if(!file.exists())
-            file.mkdir();
+        if (!file.getParentFile().exists())
+        {
+            file.getParentFile().mkdirs();
+        }
 
         process(url, file);
     }
@@ -44,7 +43,7 @@ public class ArtifactDownloader
     {
         String urlStr = url.toString();
 
-        if(!urlStr.endsWith("/"))
+        if (!urlStr.endsWith("/"))
         {
             FileOutputStream fos = new FileOutputStream(file);
             download(url, fos);
@@ -56,7 +55,10 @@ public class ArtifactDownloader
 
             for (Element el : elements)
             {
-                if(el.text().equals("../")) continue;
+                if(el.text().equals("../"))
+                {
+                    continue;
+                }
 
                 process(new URL(urlStr + el.text()), new File(file.getAbsolutePath() + "/" + el.text()));
             }
