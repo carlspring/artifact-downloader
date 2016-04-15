@@ -100,6 +100,13 @@ public class ArtifactDownloader
 
                     totalBytesRead += numberOfBytesRead;
 
+                    long duration = System.currentTimeMillis() - startTime;
+
+                    result.setContentLength(contentLength);
+                    result.setDownloadLength(totalBytesRead);
+                    result.setDuration(duration);
+                    result.setResponseCode(response.getStatusLine().getStatusCode());
+
                     if (verbose && contentLength > 0)
                     {
                         if (totalBytesRead != contentLength)
@@ -110,24 +117,21 @@ public class ArtifactDownloader
                             }
                             else
                             {
-                                BigDecimal percent = new BigDecimal((100d * totalBytesRead) / contentLength);
+                                BigDecimal percent = totalBytesRead > 0 ?
+                                                     new BigDecimal((100d * totalBytesRead) / contentLength) :
+                                                     new BigDecimal(0);
 
                                 System.out.print("\rDownloaded " + percent.intValue() + "/100 %...");
                             }
                         }
                         else
                         {
-                            long duration = System.currentTimeMillis() - startTime;
-
-                            result.setContentLength(contentLength);
-                            result.setDownloadLength(totalBytesRead);
-                            result.setDuration(duration);
-                            result.setResponseCode(response.getStatusLine().getStatusCode());
-
                             System.out.println("\rDownloaded " + totalBytesRead + "/" + contentLength + " bytes in " +
                                                duration + " ms " +
                                                "from " + url.toString() + " " +
-                                               "at an average speed of " + (contentLength / (duration / 1000)) + " bytes/s.");
+                                               "at an average speed of " +
+                                               (duration > 0 ? (contentLength / (duration / 1000)) : contentLength) +
+                                               " bytes/s.");
                         }
                     }
 

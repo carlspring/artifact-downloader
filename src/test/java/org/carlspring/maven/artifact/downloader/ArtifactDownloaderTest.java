@@ -56,7 +56,7 @@ public class ArtifactDownloaderTest
                            "com/foo/blah/1.0/blah-1.0.pom",
                            "com/foo/blah/1.0/blah-1.0.pom.md5",
                            "com/foo/blah/1.0/blah-1.0.pom.sha1"
-                          };
+        };
 
         Random r = new Random();
 
