@@ -83,12 +83,36 @@ public class ArtifactRestlet
     {
         logger.debug(" repositoryId = " + repositoryId + ", path = " + path);
 
-        // Create random data.
-        logger.debug("Generating stream with " + length + " bytes.");
+        if (length > 0)
+        {
+            // Create random data.
+            logger.debug("Generating stream with " + length + " bytes.");
 
-        return Response.ok(new RandomInputStream(length))
-                       .header("Content-Length", length)
-                       .build();
+            return Response.ok(new RandomInputStream(length))
+                           .header("Content-Length", length)
+                           .build();
+        }
+        else
+        {
+            // TODO: Implement the directory browsing here.
+            // TODO: If the path is a directory, serve an HTML with the contents of the directory.
+            // TODO: If it's a file, serve the file.
+
+            File file = new File("target/storages/" + storageId + "/" + repositoryId + "/" + path);
+            if (file.isDirectory())
+            {
+                // TODO: If the path is a directory, serve an HTML with the contents of the directory.
+                // TODO: Implement this HERE.
+
+                // For the sake of compiling.
+                return null;
+            }
+            else
+            {
+                InputStream is = new FileInputStream(file);
+                return Response.ok(is).build();
+            }
+        }
     }
 
     @DELETE
