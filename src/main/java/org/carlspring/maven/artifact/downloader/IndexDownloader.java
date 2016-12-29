@@ -183,4 +183,14 @@ public class IndexDownloader
         this.indexDir = indexDir;
     }
 
+    public Indexer getIndexer()
+    {
+        return indexer;
+    }
+
+    public IndexingContext getIndexingContext()
+    {
+        return centralContext;
+    }
+
 }
