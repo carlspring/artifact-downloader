@@ -5,6 +5,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -26,8 +29,41 @@ public class ArtifactDownloader
             throws IOException,
                    URISyntaxException
     {
-        FileOutputStream fos = new FileOutputStream(file);
-        download(url, fos);
+        if (!file.getParentFile().exists())
+        {
+            file.getParentFile().mkdirs();
+        }
+
+        process(url, file);
+    }
+
+    private void process(URL url, File file)
+            throws IOException,
+            URISyntaxException
+    {
+        String urlStr = url.toString();
+
+        if (!urlStr.endsWith("/"))
+        {
+            FileOutputStream fos = new FileOutputStream(file);
+            download(url, fos);
+        }
+        else
+        {
+            org.jsoup.nodes.Document doc = Jsoup.connect(urlStr).get();
+            Elements elements = doc.select("a[href]");
+
+            for (Element el : elements)
+            {
+                if(el.text().equals("../"))
+                {
+                    continue;
+                }
+
+                process(new URL(urlStr + el.text()), new File(file.getAbsolutePath() + "/" + el.text()));
+            }
+        }
+
     }
 
     public DownloadResult download(URL url, OutputStream os)
