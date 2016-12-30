@@ -16,10 +16,17 @@ import java.util.Random;
 public class ArtifactDownloaderTest
 {
 
-    public static final String TARGET_DIR = "target/test-resources";
-    public static final String REPOSITORY_DIR = "target/storages/storage0/test-releases";
-    public static final String DOWNLOADS_DIR = "target/test-downloads";
+    private static final String TARGET_DIR = "target/test-resources";
 
+    private static final String REPOSITORY_DIR = "target/storages/storage0/test-releases";
+
+    private static final String DOWNLOADS_DIR = "target/test-downloads";
+
+    private String host = System.getProperty("strongbox.host") != null ?
+                          System.getProperty("strongbox.host") : "localhost";
+
+    private int port = System.getProperty("strongbox.port") != null ?
+                       Integer.parseInt(System.getProperty("strongbox.port")) : 48080;
 
     @Before
     public void setUp() throws Exception
@@ -87,7 +94,8 @@ public class ArtifactDownloaderTest
     {
         ArtifactDownloader downloader = new ArtifactDownloader();
         downloader.setVerbose(true);
-        downloader.download(new URL("http://localhost:48080/storages/storage0/test-releases/com/foo/bar/1.0/bar-1.0.jar?length=89128960"),
+        downloader.download(new URL("http://" + host + ":" + port +
+                                    "/storages/storage0/test-releases/com/foo/bar/1.0/bar-1.0.jar?length=89128960"),
                             new File(TARGET_DIR + "/bar-1.0.jar"));
     }
 
@@ -98,7 +106,8 @@ public class ArtifactDownloaderTest
         ArtifactDownloader downloader = new ArtifactDownloader();
         downloader.setVerbose(true);
 
-        downloader.download(new URL("http://localhost:48080/storages/storage0/test-releases/com/foo/"),
+        downloader.download(new URL("http://" + host + ":" + port +
+                                    "/storages/storage0/test-releases/com/foo/"),
                             new File(DOWNLOADS_DIR + "/"));
     }
 
