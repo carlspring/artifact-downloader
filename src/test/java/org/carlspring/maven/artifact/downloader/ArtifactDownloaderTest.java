@@ -22,11 +22,11 @@ public class ArtifactDownloaderTest
 
     private static final String DOWNLOADS_DIR = "target/test-downloads";
 
-    private String host = System.getProperty("strongbox.host") != null ?
-                          System.getProperty("strongbox.host") : "localhost";
+    private String host = System.getProperty("host") != null ?
+                          System.getProperty("host") : "localhost";
 
-    private int port = System.getProperty("strongbox.port") != null ?
-                       Integer.parseInt(System.getProperty("strongbox.port")) : 48080;
+    private int port = System.getProperty("port") != null ?
+                       Integer.parseInt(System.getProperty("port")) : 48080;
 
     @Before
     public void setUp() throws Exception
